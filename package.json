@@ -12,9 +12,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "ghostscript4js": "^3.2.1",
-    "z": "1.0.9",
-    "node-native-printer": "1.0.0-beta.5"
+    "node-native-printer": "1.0.0-beta.5",
+    "rsmq-promise": "^1.0.4",
+    "z": "1.0.9"
   },
   "devDependencies": {
     "jsesc": "3.0.1"
