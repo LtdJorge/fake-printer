@@ -1,0 +1,22 @@
+{
+  "name": "fake-printer",
+  "version": "1.0.0",
+  "description": "Fake printer that redirects to other printers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LtdJorge",
+  "repository": {
+    "directory": "."
+  },
+  "license": "MIT",
+  "dependencies": {
+    "ghostscript4js": "^3.2.1",
+    "z": "1.0.9",
+    "node-native-printer": "1.0.0-beta.5"
+  },
+  "devDependencies": {
+    "jsesc": "3.0.1"
+  }
+}

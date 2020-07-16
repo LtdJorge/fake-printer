@@ -1,0 +1,9 @@
+{
+    "printers": [
+        {
+            "address": "192.168.1.242",
+            "port": 9100,
+            "numberOfCopies": 3
+        }
+    ]
+}
