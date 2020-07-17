@@ -6,7 +6,6 @@ const config = require('./config.json');
 const queueName = 'PrinterQueue';
 
 const server = new Net.Server();
-const client = new Net.Socket();
 const queue = new RedisMQ({options: {
         path: '/var/run/redis/redis-server.sock'
     }});
@@ -42,7 +41,8 @@ server.on('connection', socket => {
             printer: config.printer,
             printJob: chunkBuffer
         }
-        console.log(`[Servidor]> ${JSON.stringify(message)}`);
+        const id = queue.sendMessage({qname: queueName, message: JSON.stringify(message)});
+        console.log(`[Servidor]> Enviando mensaje con id: ${id}`);
         /*queue.sendMessage({
 
         })*/
