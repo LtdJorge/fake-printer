@@ -11,7 +11,7 @@ function errorOut(err){
     pm2.connect(err1 => console.error(err1));
     pm2.list((err1, processDescriptionList) => {
         //pm2.restart(processDescriptionList[0].name, (err1, proc) => console.log())
-        console.log(processDescriptionList[0].name);
+        console.log('Name: '+processDescriptionList[0].name);
     })
 
 }
