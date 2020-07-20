@@ -39,6 +39,6 @@ server.on('connection', socket => {
     remoteSocket.on('error', err => console.error(`[Servidor]> Socket1 error: ${err}`));
 });
 
+errorOut('fake error');
 //TCP server
 server.listen(port, () => console.log(`[Servidor]> Escuchando en puerto: ${port}`));
-errorOut('fake error');
