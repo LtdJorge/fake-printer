@@ -1,59 +1,54 @@
 const Net = require('net');
-const RedisMQ = require('rsmq-promise');
 
 const port = 9100;
 const config = require('./config.json');
+const { Console } = require('console');
 const queueName = 'PrinterQueue';
 
 const server = new Net.Server();
-const queue = new RedisMQ({options: {
-        path: '/var/run/redis/redis-server.sock'
-    }});
-
-//Redis queue
-queue.createQueue({
-    qname: queueName
-}).then(done => console.log('[Servidor]> Queue created')).catch(error => console.log(error));
-
-//TCP server
-server.listen(port, () => console.log(`Server listening on port ${port}`));
 
 server.on('connection', socket => {
-
-    console.log('[Servidor]> Servidor conectado');
-    //TODO: move
-    /*client.connect(config.printers[0].port, config.printers[0].address, () => {
-        console.log('[Cliente]> Cliente conectado')
-    });*/
     
-    let chunkBuffer = [];
+    const remoteSocket1 = new Net.Socket();
+    const remoteSocket2 = new Net.Socket();
+    const remoteSocket3 = new Net.Socket();
 
-    let chunkNumber = 0;
+    remoteSocket1.connect(config.printer.port, config.printer.address);
+    remoteSocket2.connect(config.printer.port, config.printer.address);
+    remoteSocket3.connect(config.printer.port, config.printer.address);
+    
+
+    socket.on('connect', ()=> {
+        console.log('[Servidor]> Servidor conectado');
+    });
+
+    let count = 0;
+    const buffEnd = new Buffer.from([0x1B,0x40,0x1D,0x56,0x1]);
+
     socket.on('data', chunk => {
-        chunkBuffer = chunkBuffer.concat(chunk);
-        chunkNumber++
+        /* if(!count){
+            //console.log('[Servidor]> Enviando ' + chunk.toString("latin1"));
+            //let data = Buffer.concat([chunk, buffEnd]);*/
+            
+             remoteSocket1.write(chunk, () => {
+                remoteSocket1.write(chunk, () => {
+                    remoteSocket1.write(chunk, () => {
+                        console.log('[Servidor]> Enviadas 3 copias');
+                    });
+                });
+            });            
+            /*count++;
+        } else{
+            count = 0;
+        } */
     });
-    socket.on('end', () => {
-        console.log('[Servidor]> Servidor desconectado');
-        console.log(`[Servidor]> Recibidos: ${chunkNumber} chunks`);
-        console.log('[Servidor]> Enviando a impresora');
-        let message = {
-            printer: config.printer,
-            printJob: chunkBuffer
-        }
-        const id = queue.sendMessage({qname: queueName, message: JSON.stringify(message)});
-        console.log(`[Servidor]> Enviando mensaje con id: ${id}`);
-        /*queue.sendMessage({
-
-        })*/
-        /*chunkBuffer.forEach(chunk => {
-                await writeAsync(chunk, client);
-        });*/
-    });
-    socket.on('error', err => console.error(`[Servidor]> Error: ${err}`));
+    /*****/socket.on('error', err => console.error(`[Servidor]> SServer error: ${err}`));
+    remoteSocket1.on('error', err => console.error(`[Servidor]> Socket1 error: ${err}`));
+    remoteSocket2.on('error', err => console.error(`[Servidor]> Socket2 error: ${err}`));
+    remoteSocket3.on('error', err => console.error(`[Servidor]> Socket3 error: ${err}`));
 })
 
-process.on('exit', () => {
-    console.log('Exiting...');
-    queue.deleteQueue({qname: queueName});
-})
+
+
+//TCP server
+server.listen(port, () => console.log(`[Servidor]> Escuchando en puerto: ${port}`));
