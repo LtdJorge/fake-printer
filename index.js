@@ -7,7 +7,7 @@ const config = require('./config.json');
 const server = new Net.Server();
 
 function errorOut(err){
-    console.error(`[Servidor]> Server error: ${err}`);
+    console.log(`[Servidor]> Server error: ${err}`);
     pm2.connect(err1 => console.error(err1));
     pm2.list((err1, processDescriptionList) => {
         //pm2.restart(processDescriptionList[0].name, (err1, proc) => console.log())
