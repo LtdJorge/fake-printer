@@ -9,7 +9,7 @@ const server = new Net.Server();
 function errorOut(err){
     console.error(`[Servidor]> Server error: ${err}`);
     pm2.connect(err1 => console.error(err1));
-    pm2.restart('index', (err1, proc) => {
+    pm2.restart('index', (err1) => {
         if (err1) console.error(err1);
     });
 }
@@ -33,10 +33,9 @@ server.on('connection', socket => {
             });
         });
     });
-    socket.on('error', err => console.error(`[Servidor]> SServer error: ${err}`));
-    remoteSocket.on('error', err => console.error(`[Servidor]> Socket1 error: ${err}`));
+    socket.on('error', err => errorOut(err));
+    remoteSocket.on('error', err => errorOut(err));
 });
 
-errorOut('fake error');
 //TCP server
 server.listen(port, () => console.log(`[Servidor]> Escuchando en puerto: ${port}`));
