@@ -7,17 +7,15 @@ const config = require('./config.json');
 const server = new Net.Server();
 
 function errorOut(err){
-    console.log(`[Servidor]> Server error: ${err}`);
+    console.error(`[Servidor]> Server error: ${err}`);
     pm2.connect(err1 => console.error(err1));
-    pm2.list((err1, processDescriptionList) => {
-        //pm2.restart(processDescriptionList[0].name, (err1, proc) => console.log())
-        console.log('Name: '+processDescriptionList[0].name);
-    })
-
+    pm2.restart('index', (err1, proc) => {
+        if (err1) console.error(err1);
+    });
 }
 
 server.on('connection', socket => {
-    
+
     const remoteSocket = new Net.Socket();
 
     remoteSocket.connect(config.printer.port, config.printer.address);
