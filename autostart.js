@@ -22,3 +22,5 @@ pm2.startup('systemd', ((err, result) => {
     console.error(err);
     pm2.disconnect();
 }));
+
+process.exit();
