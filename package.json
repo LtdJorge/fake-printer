@@ -12,13 +12,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "node-native-printer": "1.0.0-beta.5",
-    "rsmq": "^0.12.2",
-    "rsmq-promise": "^1.0.4",
-    "rsmq-worker": "^0.5.2",
-    "z": "1.0.9"
-  },
-  "devDependencies": {
-    "jsesc": "3.0.1"
+    "pm2": "^4.4.0"
   }
 }
