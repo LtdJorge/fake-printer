@@ -1,5 +1,5 @@
 const socket = new require('net').Socket();
-socket.connect(9100, '192.168.1.242');
+socket.connect(9100, '192.168.1.100');
 function exit(){
     process.exit();
 }

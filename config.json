@@ -1,7 +1,7 @@
 {
     "printer": {
-        "address": "192.168.1.100",
-        "port": 9100,
+        "address": "192.168.1.91",
+        "port": 8100,
         "numberOfCopies": 3
     }
 }

@@ -15,15 +15,19 @@ function errorOut(err){
     });
 }
 
-server.on('connection', socket => {
+function printMessage(msg){
+    const now = new Date();
+    console.log(`[Servidor]> ${now.getHours()}:${now.getMinutes()} ${msg}`)
+}
 
+server.on('connection', socket => {
     const remoteSocket = new Net.Socket();
 
     remoteSocket.connect(config.printer.port, config.printer.address);
 
     socket.on('connect', ()=> {
         const now = new Date();
-        console.log('[Servidor]> ${now.getHours()}:${now.getMinutes()} Servidor conectado');
+        printMessage("Servidor conectado");
     });
 
     socket.on('data', chunk => {
@@ -31,7 +35,7 @@ server.on('connection', socket => {
          remoteSocket.write(chunk, () => {
             remoteSocket.write(chunk, () => {
                 remoteSocket.write(chunk, () => {
-                    console.log('[Servidor]> ${now.getHours()}:${now.getMinutes()} Enviadas 3 copias');
+                    printMessage("Enviadas 3 copias");
                 });
             });
         });
@@ -41,4 +45,4 @@ server.on('connection', socket => {
 });
 
 //TCP server
-server.listen(port, () => console.log(`[Servidor]> Escuchando en puerto: ${port}`));
+server.listen(port, () => printMessage(`Escuchando en puerto: ${port}`));

@@ -11,7 +11,7 @@ server.on('connection', socket => {
     console.log('[Impresora]> Impresora conectada');
 
     socket.on('data', chunk => {
-        console.log('Received chunk: '+chunk.toString('latin1'));
+        console.log('[Impresora]> Received chunk: '+chunk.toString('latin1'));
     });
 
     socket.on('end', () => {

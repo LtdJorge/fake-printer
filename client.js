@@ -1,3 +1,9 @@
+/**
+ * Parte de la anterior implementacion
+ * con redis queue
+ */
+
+
 const Net = require('net');
 const RedisMQ = require('rsmq');
 const RSMQWorker = require('rsmq-worker');
