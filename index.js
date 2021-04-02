@@ -84,7 +84,7 @@ server.on('error', err => {
 });
 
 //TCP server
-server.listen({ port, host: '192.168.0.100' }, () =>
+server.listen({ port }, () =>
     printServerMessage(`Escuchando en puerto: ${port}`)
 );
 
