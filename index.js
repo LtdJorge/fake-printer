@@ -6,43 +6,96 @@ const config = require('./config.json');
 
 const server = new Net.Server();
 
-function errorOut(err){
+function errorOut(err, isServer) {
     const now = new Date();
-    console.error(`[Servidor]> ${now.getHours()}:${now.getMinutes()} Server error: ${err}`);
+    if (isServer) {
+        console.error(
+            `[Servidor]> ${now.getHours()}:${now.getMinutes()} Error en servidor: ${err}`
+        );
+    } else {
+        console.error(
+            `[Cliente]> ${now.getHours()}:${now.getMinutes()} Error en cliente: ${err}`
+        );
+    }
     pm2.connect(err1 => console.error(err1));
-    pm2.restart('index', (err1) => {
+    pm2.restart('index', err1 => {
         if (err1) console.error(err1);
     });
 }
 
-function printMessage(msg){
+function printServerMessage(msg) {
     const now = new Date();
-    console.log(`[Servidor]> ${now.getHours()}:${now.getMinutes()} ${msg}`)
+    console.log(`[Servidor]> ${now.getHours()}:${now.getMinutes()} ${msg}`);
+}
+
+function printSocketMessage(msg) {
+    const now = new Date();
+    console.log(`[Cliente]> ${now.getHours()}:${now.getMinutes()} ${msg}`);
+}
+
+function writeDataToSocket(socket, chunk, iterator) {
+    if (iterator === 0) return;
+    printSocketMessage(`Enviando copia: ${iterator}`);
+    socket.write(chunk, writeDataToSocket(socket, chunk, iterator - 1));
 }
 
 server.on('connection', socket => {
+    printServerMessage('Servidor conectado');
+    printServerMessage(JSON.stringify(server.address()));
+
     const remoteSocket = new Net.Socket();
 
     remoteSocket.connect(config.printer.port, config.printer.address);
 
-    socket.on('connect', ()=> {
-        const now = new Date();
-        printMessage("Servidor conectado");
-    });
+    // socket.on('connect', () => {
+    //     printServerMessage('Servidor conectado');
+    // });
 
     socket.on('data', chunk => {
-         const now = new Date();
-         remoteSocket.write(chunk, () => {
-            remoteSocket.write(chunk, () => {
-                remoteSocket.write(chunk, () => {
-                    printMessage("Enviadas 3 copias");
-                });
-            });
-        });
+        writeDataToSocket(remoteSocket, chunk, config.printer.numberOfCopies);
+        //     // console.log(chunk.toString('base64'));
+        //     // remoteSocket.write(chunk, () => {
+        //     //     remoteSocket.write(chunk, () => {
+        //     //         remoteSocket.write(chunk, () => {
+        //     //             printSocketMessage('Enviadas 3 copias');
+        //     //         });
+        //     //     });
+        //     // });
     });
-    socket.on('error', err => errorOut(err));
-    remoteSocket.on('error', err => errorOut(err));
+
+    // socket.on('data', chunk => {
+    //     console.log(chunk.toString('hex'));
+    // });
+
+    socket.on('error', err => errorOut(err, true));
+
+    socket.on('end', () => printServerMessage('Cerrando conexion'));
+
+    socket.on('close', () => printServerMessage('Cerrando socket'));
+
+    remoteSocket.on('error', err => errorOut(err, false));
+});
+
+server.on('listening', console.log);
+
+server.on('error', err => {
+    errorOut(err, true);
+    exit().then(r => r);
 });
 
 //TCP server
-server.listen(port, () => printMessage(`Escuchando en puerto: ${port}`));
+server.listen({ port, host: '192.168.0.100' }, () =>
+    printServerMessage(`Escuchando en puerto: ${port}`)
+);
+
+process.on('SIGINT', () => {
+    exit().then(r => r);
+});
+
+async function exit() {
+    await server.close(err => {
+        if (err) errorOut(err);
+        printServerMessage('Cerrando servidor');
+    });
+    process.exit();
+}
