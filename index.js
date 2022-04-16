@@ -23,6 +23,10 @@ function errorOut(err, isServer) {
     });
 }
 
+function delayFunction(fun, timeout, socket, chunk, iterator){
+    setTimeout(fun, timeout, socket, chunk, iterator);
+}
+
 function printServerMessage(msg) {
     const now = new Date();
     console.log(`[Servidor]> ${now.getHours()}:${now.getMinutes()} ${msg}`);
@@ -34,9 +38,12 @@ function printSocketMessage(msg) {
 }
 
 function writeDataToSocket(socket, chunk, iterator) {
-    if (iterator === 0) return;
+    if (iterator === 0){
+        socket.end();
+        return;
+    }
     printSocketMessage(`Enviando copia: ${iterator}`);
-    socket.write(chunk, writeDataToSocket(socket, chunk, iterator - 1));
+    socket.write(chunk, delayFunction(writeDataToSocket, 50, socket, chunk, iterator - 1));
 }
 
 server.on('connection', socket => {
