@@ -1,6 +1,6 @@
 const Net = require('net');
 
-const port = 8100;
+const port = 9100;
 const config = require('./config.json');
 
 const server = new Net.Server();

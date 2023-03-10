@@ -10,11 +10,11 @@ function errorOut(err, isServer) {
     const now = new Date();
     if (isServer) {
         console.error(
-            `[Servidor]> ${now.getHours()}:${now.getMinutes()} Error en servidor: ${err}`
+            `[Servidor]> ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} Error en servidor: ${err}`
         );
     } else {
         console.error(
-            `[Cliente]> ${now.getHours()}:${now.getMinutes()} Error en cliente: ${err}`
+            `[Cliente]> ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} Error en cliente: ${err}`
         );
     }
     pm2.connect(err1 => console.error(err1));
@@ -29,12 +29,12 @@ function delayFunction(fun, timeout, socket, chunk, iterator){
 
 function printServerMessage(msg) {
     const now = new Date();
-    console.log(`[Servidor]> ${now.getHours()}:${now.getMinutes()} ${msg}`);
+    console.log(`[Servidor]> ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} ${msg}`);
 }
 
 function printSocketMessage(msg) {
     const now = new Date();
-    console.log(`[Cliente]> ${now.getHours()}:${now.getMinutes()} ${msg}`);
+    console.log(`[Cliente]> ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} ${msg}`);
 }
 
 function writeDataToSocket(socket, chunk, iterator) {
