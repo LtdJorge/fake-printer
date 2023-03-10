@@ -43,7 +43,9 @@ function writeDataToSocket(socket, chunk, iterator) {
         return;
     }
     printSocketMessage(`Enviando copia: ${iterator}`);
-    socket.write(chunk, delayFunction(writeDataToSocket, 50, socket, chunk, iterator - 1));
+    socket.write(chunk, () => {
+        delayFunction(writeDataToSocket, 50, socket, chunk, iterator - 1)
+    });
 }
 
 server.on('connection', socket => {
