@@ -12,6 +12,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "pm2": "^4.4.0"
+    "pm2": "^5.2.2",
+    "@homebridge/ciao": "^1.1.5"
   }
 }

@@ -1,10 +1,19 @@
 const Net = require('net');
 const pm2 = require('pm2');
+const bonjour = require('@homebridge/ciao')
 
 const port = 9100;
 const config = require('./config.json');
 
 const server = new Net.Server();
+
+const responder = bonjour.getResponder();
+
+const service = responder.createService({
+    name: 'POS-80 Proxy',
+    type: 'pdl-datastream',
+    port: 9100
+})
 
 function errorOut(err, isServer) {
     const now = new Date();
@@ -93,8 +102,12 @@ server.on('error', err => {
 });
 
 //TCP server
-server.listen({ port }, () =>
-    printServerMessage(`Escuchando en puerto: ${port}`)
+server.listen({ port }, () => {
+        service.advertise().then(() => {
+            printServerMessage("Anunciando servicio Bonjour");
+        });
+        printServerMessage(`Escuchando en puerto: ${port}`);
+    }
 );
 
 process.on('SIGINT', () => {
@@ -102,6 +115,10 @@ process.on('SIGINT', () => {
 });
 
 async function exit() {
+    service.end().then(() => {
+        printServerMessage("Dejando de anunciar servicio Bonjour");
+        service.destroy();
+    });
     await server.close(err => {
         if (err) errorOut(err);
         printServerMessage('Cerrando servidor');
