@@ -3,6 +3,7 @@ const pm2 = require('pm2');
 const bonjour = require('@homebridge/ciao')
 
 const port = 9100;
+const host = "0.0.0.0"
 const config = require('./config.json');
 
 const server = new Net.Server();
@@ -102,7 +103,7 @@ server.on('error', err => {
 });
 
 //TCP server
-server.listen({ port }, () => {
+server.listen({ port, host }, () => {
         service.advertise().then(() => {
             printServerMessage("Anunciando servicio Bonjour");
         });
