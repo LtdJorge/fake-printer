@@ -1,3 +1,4 @@
+const uuid = require('@lukeed/uuid');
 const Net = require('net');
 const pm2 = require('pm2');
 const bonjour = require('@homebridge/ciao')
@@ -12,7 +13,22 @@ const responder = bonjour.getResponder();
 
 const service = responder.createService({
     name: 'POS-80 Proxy',
-    type: 'pdl-datastream',
+    type: 'printer',
+    host: 'pos80proxy',
+    txt: {
+      "product":"POS-80 Proxy",
+      "rp": "auto",
+      "adminurl":"http://pos80proxy.local:80/",
+      "pdl":"raw",
+      "usb_mfg":"Approx",
+      "usb_mdl":"POS-80C",
+      "txtvers":"1",
+      "ty": "Approx POS-80C",
+      "priority":"50",
+      "uuid": uuid.v4(),
+      "note": "Impresora cocina"
+    },
+    disabledIpv6: true,
     port: 9100
 })
 
