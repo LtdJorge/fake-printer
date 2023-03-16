@@ -115,10 +115,10 @@ process.on('SIGINT', () => {
 });
 
 async function exit() {
-    service.end().then(() => {
-        printServerMessage("Dejando de anunciar servicio Bonjour");
-        service.destroy();
-    });
+    await service.end()
+    printServerMessage("Dejando de anunciar servicio Bonjour");
+    await service.destroy();
+    await responder.shutdown();
     await server.close(err => {
         if (err) errorOut(err);
         printServerMessage('Cerrando servidor');
