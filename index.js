@@ -4,7 +4,7 @@ const pm2 = require('pm2');
 const bonjour = require('@homebridge/ciao')
 
 const port = 9100;
-const host = "0.0.0.0"
+const host = "192.168.2.91"
 const config = require('./config.json');
 
 const server = new Net.Server();
