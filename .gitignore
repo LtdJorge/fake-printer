@@ -1,5 +1,5 @@
 node_modules
-.idea
 *.swp
 logs
 config.json
+npm-debug.log
