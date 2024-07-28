@@ -15,5 +15,8 @@
     "pm2": "^5.2.2",
     "@homebridge/ciao": "^1.1.5",
     "@lukeed/uuid": "latest"
+  },
+  "engines": {
+    "node": "^18"
   }
 }
