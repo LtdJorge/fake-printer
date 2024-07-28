@@ -14,11 +14,11 @@ pm2.start({
     max_restarts: 5,
     interpreter: 'node',
     watch: true
-    }, (err, proc) =>{
+    }, (err, _proc) =>{
         console.error(err);
 });
 
-pm2.startup('systemd', ((err, result) => {
+pm2.startup('systemd', ((err, _result) => {
     console.error(err);
     pm2.disconnect();
 }));

@@ -1,46 +1,45 @@
-const uuid = require('@lukeed/uuid');
-const Net = require('net');
-const pm2 = require('pm2');
-const bonjour = require('@homebridge/ciao')
+import uuid from '@lukeed/uuid';
+import Net from 'net';
+import pm2 from 'pm2';
+import bonjour, { ServiceType } from '@homebridge/ciao';
+import config from './config.json';
 
 const port = 9100;
-const host = "192.168.1.91"
-const config = require('./config.json');
-
+const host = '192.168.1.91';
 const server = new Net.Server();
 
 const responder = bonjour.getResponder();
 
 const service = responder.createService({
     name: 'POS-80 Proxy',
-    type: 'printer',
-    host: 'pos80proxy',
+    type: ServiceType.PRINTER,
+    hostname: 'pos80proxy',
     txt: {
-      "product":"POS-80 Proxy",
-      "rp": "auto",
-      "adminurl":"http://pos80proxy.local:80/",
-      "pdl":"raw",
-      "usb_mfg":"Approx",
-      "usb_mdl":"POS-80C",
-      "txtvers":"1",
-      "ty": "Approx POS-80C",
-      "priority":"50",
-      "uuid": uuid.v4(),
-      "note": "Impresora cocina"
+        'product': 'POS-80 Proxy',
+        'rp': 'auto',
+        'adminurl': 'http://pos80proxy.local:80/',
+        'pdl': 'raw',
+        'usb_mfg': 'Approx',
+        'usb_mdl': 'POS-80C',
+        'txtvers': '1',
+        'ty': 'Approx POS-80C',
+        'priority': '50',
+        'uuid': uuid.v4(),
+        'note': 'Impresora cocina'
     },
     disabledIpv6: true,
     port: 9100
-})
+});
 
 function errorOut(err, isServer) {
     const now = new Date();
     if (isServer) {
         console.error(
-            `[Servidor]> ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} Error en servidor: ${err}`
+            `[Server]> ${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} Error in server: ${err}`
         );
     } else {
         console.error(
-            `[Cliente]> ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} Error en cliente: ${err}`
+            `[Client]> ${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} Error in client: ${err}`
         );
     }
     pm2.connect(err1 => console.error(err1));
@@ -49,64 +48,48 @@ function errorOut(err, isServer) {
     });
 }
 
-function delayFunction(fun, timeout, socket, chunk, iterator){
+function delayFunction(fun, timeout, socket, chunk, iterator) {
     setTimeout(fun, timeout, socket, chunk, iterator);
 }
 
 function printServerMessage(msg) {
     const now = new Date();
-    console.log(`[Servidor]> ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} ${msg}`);
+    console.log(`[Server]> ${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} ${msg}`);
 }
 
 function printSocketMessage(msg) {
     const now = new Date();
-    console.log(`[Cliente]> ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} ${msg}`);
+    console.log(`[Client]> ${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()} ${msg}`);
 }
 
 function writeDataToSocket(socket, chunk, iterator) {
-    if (iterator === 0){
+    if (iterator === 0) {
         socket.end();
         return;
     }
-    printSocketMessage(`Enviando copia: ${iterator}`);
+    printSocketMessage(`Sending copy: ${iterator}`);
     socket.write(chunk, () => {
-        delayFunction(writeDataToSocket, 50, socket, chunk, iterator - 1)
+        delayFunction(writeDataToSocket, 50, socket, chunk, iterator - 1);
     });
 }
 
 server.on('connection', socket => {
-    printServerMessage('Servidor conectado');
+    printServerMessage('Server connected');
     printServerMessage(JSON.stringify(server.address()));
 
     const remoteSocket = new Net.Socket();
 
     remoteSocket.connect(config.printer.port, config.printer.address);
 
-    // socket.on('connect', () => {
-    //     printServerMessage('Servidor conectado');
-    // });
-
     socket.on('data', chunk => {
         writeDataToSocket(remoteSocket, chunk, config.printer.numberOfCopies);
-        //     // console.log(chunk.toString('base64'));
-        //     // remoteSocket.write(chunk, () => {
-        //     //     remoteSocket.write(chunk, () => {
-        //     //         remoteSocket.write(chunk, () => {
-        //     //             printSocketMessage('Enviadas 3 copias');
-        //     //         });
-        //     //     });
-        //     // });
     });
-
-    // socket.on('data', chunk => {
-    //     console.log(chunk.toString('hex'));
-    // });
 
     socket.on('error', err => errorOut(err, true));
 
-    socket.on('end', () => printServerMessage('Cerrando conexion'));
+    socket.on('end', () => printServerMessage('Closing connection'));
 
-    socket.on('close', () => printServerMessage('Cerrando socket'));
+    socket.on('close', () => printServerMessage('Closing socket'));
 
     remoteSocket.on('error', err => errorOut(err, false));
 });
@@ -121,9 +104,9 @@ server.on('error', err => {
 //TCP server
 server.listen({ port, host }, () => {
         service.advertise().then(() => {
-            printServerMessage("Anunciando servicio Bonjour");
+            printServerMessage('Announcing Bonjour service');
         });
-        printServerMessage(`Escuchando en puerto: ${port}`);
+        printServerMessage(`Listening on port: ${port}`);
     }
 );
 
@@ -132,13 +115,13 @@ process.on('SIGINT', () => {
 });
 
 async function exit() {
-    await service.end()
-    printServerMessage("Dejando de anunciar servicio Bonjour");
+    await service.end();
+    printServerMessage('Stopping Bonjour service announcement');
     await service.destroy();
     await responder.shutdown();
     await server.close(err => {
         if (err) errorOut(err);
-        printServerMessage('Cerrando servidor');
+        printServerMessage('Closing server');
     });
     process.exit();
 }

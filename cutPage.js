@@ -1,4 +1,6 @@
-const socket = new require('net').Socket();
+import { Socket } from 'net';
+
+const socket = new Socket();
 
 socket.connect(9100, '192.168.1.108');
 
