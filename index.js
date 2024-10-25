@@ -1,8 +1,8 @@
-import uuid from '@lukeed/uuid';
+import { v4 as uuid } from '@lukeed/uuid';
 import Net from 'net';
 import pm2 from 'pm2';
 import bonjour, { ServiceType } from '@homebridge/ciao';
-import config from './config.json';
+import config from './config.json' assert { type: "json" };
 
 const port = 9100;
 const host = '192.168.1.91';
@@ -24,7 +24,7 @@ const service = responder.createService({
         'txtvers': '1',
         'ty': 'Approx POS-80C',
         'priority': '50',
-        'uuid': uuid.v4(),
+        'uuid': uuid(),
         'note': 'Impresora cocina'
     },
     disabledIpv6: true,

@@ -1,6 +1,7 @@
 {
   "name": "fake-printer",
   "version": "1.0.0",
+  "type": "module",
   "description": "Fake printer that redirects to other printers",
   "main": "index.js",
   "scripts": {
